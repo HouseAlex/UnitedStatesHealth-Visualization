@@ -1,5 +1,5 @@
 class CountyMap {
-  constructor(_config, _data) {
+  constructor(_config, _data, _colorScale) {
     this.config = {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 1000,
@@ -13,6 +13,8 @@ class CountyMap {
     };
 
     this.data = _data;
+
+    this.colorScale = _colorScale;
 
     this.us = _data;
 
@@ -45,7 +47,7 @@ class CountyMap {
     vis.path = d3.geoPath().projection(vis.projection);
 
     vis.colorScale = d3.scaleLinear()
-        .domain(d3.extent(vis.data.objects.counties.geometries, d => d.properties.medianHouseInc))
+        .domain(d3.extent(vis.data.objects.counties.geometries, d => d.properties.selectedAttribute))
         .range(['#cfe2f2', '#0d306b'])
         .interpolate(d3.interpolateHcl);
 
@@ -62,8 +64,8 @@ class CountyMap {
         .enter().append("path")
         .attr("d", vis.path)
         .attr('fill', d => {
-              if (d.properties.medianHouseInc) {
-                return vis.colorScale(d.properties.medianHouseInc);
+              if (d.properties.selectedAttribute) {
+                return vis.colorScale(d.properties.selectedAttribute);
               } else {
                 return 'url(#lightstripe)';
               }
@@ -73,7 +75,7 @@ class CountyMap {
             .on('mousemove', (d,event) => {
               console.log(d);
               console.log(event);
-                const popDensity = d.properties.medianHouseInc ? `<strong>${d.properties.medianHouseInc}</strong> pop. density per km<sup>2</sup>` : 'No data available'; 
+                const popDensity = d.properties.selectedAttribute ? `<strong>${d.properties.selectedAttribute}</strong> pop. density per km<sup>2</sup>` : 'No data available'; 
                 d3.select('#tooltip')
                   .style('display', 'block')
                   .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
