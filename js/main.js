@@ -8,7 +8,6 @@ Promise.all([
     const geo = data[0];
     const healthData = data[1];
     const options = data[2];
-    console.log(geo);
     geo.objects.counties.geometries.forEach(element => {
         for (let i = 0; i < healthData.length; i++){
             if (element.id === healthData[i].cnty_fips) {

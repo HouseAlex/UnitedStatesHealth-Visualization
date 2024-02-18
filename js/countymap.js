@@ -29,6 +29,8 @@ class CountyMap {
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
+    const filteredData = vis.data.objects.counties.geometries.filter(d => d.properties.selectedAttribute > 0);
+
     vis.svg = d3.select(vis.config.parentElement).append('svg')
         .attr('class', 'center-container')
         .attr('width', vis.config.containerWidth)
@@ -47,7 +49,7 @@ class CountyMap {
     vis.path = d3.geoPath().projection(vis.projection);
 
     vis.colorScale = d3.scaleLinear()
-        .domain(d3.extent(vis.data.objects.counties.geometries, d => d.properties.selectedAttribute))
+        .domain(d3.extent(filteredData, d => d.properties.selectedAttribute))
         .range(['#cfe2f2', '#0d306b'])
         .interpolate(d3.interpolateHcl);
 
