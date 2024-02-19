@@ -13,7 +13,7 @@ Promise.all([
     let selector1Column = options[0].attributeName;
     let selector2Column = options[1].attributeName;
 
-    // TODO Fix default displayed attribute of 2nd selects
+    // ! Fix default displayed attribute of 2nd selects
     // Attribute Selectors
     selector1 = d3.select("#columnSelector1")
         .selectAll("option")
