@@ -11,9 +11,17 @@
 <body>
     <!-- Add HTML content, SVG drawing area, ... -->
     <h1>National Health Data</h1>
+    <div class="container">
+        <select id="columnSelector1"></select>
+        <select id="columnSelector2"></select>
+    </div>
+    
 
-    <div><svg id="histogram1"></svg></div>
-    <div><svg id="countymap1"></svg></div>
+    <div class="container">   
+        <div class="margin-right" id="histogram1"></div>
+        <div id="histogram2"></div>
+    </div>
+    <div id="countymap1"></div>
 
     <div id="tooltip"></div>
     <script src="js/d3.v6.min.js"></script>

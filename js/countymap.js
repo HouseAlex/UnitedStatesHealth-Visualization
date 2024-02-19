@@ -58,7 +58,7 @@ class CountyMap {
         .attr('transform', 'translate('+vis.config.margin.left+','+vis.config.margin.top+')')
         .attr('width', vis.width + vis.config.margin.left + vis.config.margin.right)
         .attr('height', vis.height + vis.config.margin.top + vis.config.margin.bottom)
-
+    
     vis.counties = vis.g.append("g")
         .attr("id", "counties")
         .selectAll("path")
