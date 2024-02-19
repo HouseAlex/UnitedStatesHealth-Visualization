@@ -16,7 +16,7 @@
         "unit": "$"
     },
     {
-        "attributeName": "edcuation_less_than_high_school_percent",
+        "attributeName": "education_less_than_high_school_percent",
         "axisPrefer": "",
         "colorScale": [],
         "displayName": "Education Less Than High School %",

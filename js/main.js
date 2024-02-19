@@ -1,4 +1,4 @@
-let histogram1, countyMap1
+let histogram1, histogram2, countyMap1, countyMap2, scatterplot
 
 Promise.all([
     d3.json('data/counties-10m.json'),
@@ -28,8 +28,6 @@ Promise.all([
         .enter().append("option")
         .attr("value", d => d.attributeName)
         .text(d => d.displayName);
-
-    selector2.property("value", selector2Column);
 
     // Prepping the data
     geo.objects.counties.geometries.forEach(element => {
@@ -66,6 +64,11 @@ Promise.all([
         parentElement: '#histogram2'
     }, geo);
     histogram2.UpdateVis(selector2Column);
+
+    scatterplot = new Scatterplot({
+        parentElement: '#scatterplot1'
+    }, geo);
+    scatterplot.UpdateVis(selector1Column, selector2Column);
 
     /*
     countyMap1 = new CountyMap({

@@ -62,6 +62,8 @@ class Histogram {
         // ! THIS WILL NEED TO CHANGE I THINK
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[column] > 0);
 
+        //console.log(vis.filteredData);
+
         vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[column]))
         /* 
         TODO Possibly Fix widths or remove
@@ -83,7 +85,7 @@ class Histogram {
     RenderVis() {
         let vis = this;
 
-        console.log(vis.bins)
+        //console.log(vis.bins)
 
         const bins = vis.chart.selectAll('rect')
             .data(vis.bins)
