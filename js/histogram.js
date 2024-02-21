@@ -4,7 +4,7 @@ class Histogram {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 1000,
             containerHeight: _config.containerHeight || 500,
-            margin: _config.margin || {top: 20, right: 20, bottom: 20, left: 20},
+            margin: _config.margin || {top: 20, right: 20, bottom: 30, left: 50},
             tooltipPadding: _config.tooltipPadding || 15
         }
 
@@ -61,8 +61,6 @@ class Histogram {
 
         // ! THIS WILL NEED TO CHANGE I THINK
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[column] > 0);
-
-        //console.log(vis.filteredData);
 
         vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[column]))
         /* 

@@ -85,7 +85,7 @@ Promise.all([
             console.log(this.value)
             selector1Column = this.value;
             histogram1.UpdateVis(selector1Column);
-
+            scatterplot.UpdateVis(selector1Column, selector2Column);
         });
 
     d3.select("#columnSelector2")
@@ -94,7 +94,7 @@ Promise.all([
             console.log(this.value)
             selector2Column = this.value;
             histogram2.UpdateVis(selector2Column);
-
+            scatterplot.UpdateVis(selector1Column, selector2Column);
         });
     
 })
