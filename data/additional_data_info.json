@@ -1,0 +1,82 @@
+[
+    {
+        "attributeName": "poverty_perc",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Poverty %",
+        "mainColor": "",
+        "unit": "%"
+    },
+    {
+        "attributeName": "median_household_income",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Median Household Income",
+        "mainColor": "",
+        "unit": "$"
+    },
+    {
+        "attributeName": "education_less_than_high_school_percent",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Education Less Than High School %",
+        "mainColor": "",
+        "unit": "% of Pop."
+    },
+    {
+        "attributeName": "air_quality",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Air Quality",
+        "mainColor": "",
+        "unit": ""
+    },
+    {
+        "attributeName": "park_access",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Park Access",
+        "mainColor": "",
+        "unit": ""
+    },
+    {
+        "attributeName": "percent_inactive",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Inactive %",
+        "mainColor": "",
+        "unit": "%"
+    },
+    {
+        "attributeName": "percent_smoking",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Smoking %",
+        "mainColor": "",
+        "unit": "%"
+    },
+    {
+        "attributeName": "elderly_percentage",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Elderly %",
+        "mainColor": "",
+        "unit": "%"
+    },
+    {
+        "attributeName": "number_of_hospitals",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "Hospital Count",
+        "mainColor": "",
+        "unit": ""
+    },
+    {
+        "attributeName": "",
+        "axisPrefer": "",
+        "colorScale": [],
+        "displayName": "",
+        "mainColor": "",
+        "unit": ""
+    }
+]

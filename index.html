@@ -1,18 +1,41 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>D3 Project Starter Template</title>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORwOKGO=" />
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>    
-    <!-- Add HTML content, SVG drawing area, ... -->
-    
-    <!-- D3 bundle -->
-    <script src="js/d3.v6.min.js"></script>
 
-    <!-- Our JS code -->
+<body>
+    <!-- Add HTML content, SVG drawing area, ... -->
+    <h1>National Health Data</h1>
+    <div class="container">
+        <select id="columnSelector1"></select>
+        <select id="columnSelector2"></select>
+    </div>
+
+
+    <div class="container">
+        <div class="margin-right" id="histogram1"></div>
+
+        <div class="margin-right" id="scatterplot1"></div>
+        <div id="histogram2"></div>
+    </div>
+
+    <div class="container">
+        <div id="countymap1"></div>
+        <div id="countymap2"></div>
+    </div>
+
+    <div id="tooltip"></div>
+    <script src="js/d3.v6.min.js"></script>
+    <script src="js/topojson.v3.js"></script>
+    <script src="js/countymap.js"></script>
+    <script src="js/histogram.js"></script>
+    <script src="js/scatterplot.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>
