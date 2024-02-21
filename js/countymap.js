@@ -29,10 +29,7 @@ class CountyMap {
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
-    const filteredData = vis.data.objects.counties.geometries.filter(d => d.properties.selectedAttribute > 0);
-
     vis.svg = d3.select(vis.config.parentElement).append('svg')
-        .attr('class', 'center-container')
         .attr('width', vis.config.containerWidth)
         .attr('height', vis.config.containerHeight);
 
@@ -40,7 +37,7 @@ class CountyMap {
         .attr('class', 'background center-container')
         .attr('height', vis.config.containerWidth )
         .attr('width', vis.config.containerHeight)
-        .on('click', vis.clicked);
+        //.on('click', vis.clicked);
 
     vis.projection = d3.geoAlbersUsa()
         .translate([vis.width /2, vis.height /2])
@@ -48,17 +45,33 @@ class CountyMap {
 
     vis.path = d3.geoPath().projection(vis.projection);
 
-    vis.colorScale = d3.scaleLinear()
-        .domain(d3.extent(filteredData, d => d.properties.selectedAttribute))
-        .range(['#cfe2f2', '#0d306b'])
-        .interpolate(d3.interpolateHcl);
-
     vis.g = vis.svg.append('g')
         .attr('class', 'center-container center-items us-state')
         .attr('transform', 'translate('+vis.config.margin.left+','+vis.config.margin.top+')')
         .attr('width', vis.width + vis.config.margin.left + vis.config.margin.right)
         .attr('height', vis.height + vis.config.margin.top + vis.config.margin.bottom)
-    
+  }
+
+  UpdateVis(selectedAttribute) {
+    let vis = this;
+
+    vis.attribute = selectedAttribute;
+
+    const filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.attribute] > 0);
+    console.log(vis.attribute);
+
+    //! Re-map color scales later
+    vis.colorScale = d3.scaleLinear()
+        .domain(d3.extent(filteredData, d => d.properties[vis.attribute]))
+        .range(['#cfe2f2', '#0d306b'])
+        .interpolate(d3.interpolateHcl);
+
+    vis.RenderVis();
+  }
+
+  RenderVis() {
+    let vis = this;
+
     vis.counties = vis.g.append("g")
         .attr("id", "counties")
         .selectAll("path")
@@ -66,45 +79,33 @@ class CountyMap {
         .enter().append("path")
         .attr("d", vis.path)
         .attr('fill', d => {
-              if (d.properties.selectedAttribute) {
-                return vis.colorScale(d.properties.selectedAttribute);
+              if (d.properties[vis.attribute]) {
+                return vis.colorScale(d.properties[vis.attribute]);
               } else {
                 return 'url(#lightstripe)';
               }
             });
 
-            vis.counties
-            .on('mousemove', (d,event) => {
-              console.log(d);
-              console.log(event);
-                const popDensity = d.properties.selectedAttribute ? `<strong>${d.properties.selectedAttribute}</strong> pop. density per km<sup>2</sup>` : 'No data available'; 
-                d3.select('#tooltip')
-                  .style('display', 'block')
-                  .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
-                  .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-                  .html(`
-                    <div class="tooltip-title">${d.properties.name}</div>
-                    <div>${popDensity}</div>
-                  `);
-              })
-              .on('mouseleave', () => {
-                d3.select('#tooltip').style('display', 'none');
-              });
+    vis.counties.on('mousemove', (event, d) => {
+          const popDensity = d.properties[vis.attribute] ? `<strong>${d.properties[vis.attribute]}</strong>` : 'No data available'; 
+          d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+            .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+            .html(`
+              <div class="tooltip-title">${d.properties.display_name}</div>
+              <div>${popDensity}</div>
+            `);
+        })
+        .on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+        });
 
 
 
     vis.g.append("path")
         .datum(topojson.mesh(vis.us, vis.us.objects.states, function(a, b) { return a !== b; }))
         .attr("id", "state-borders")
-        .attr("d", vis.path);    
-
-    vis.UpdateVis();
-  }
-
-  RenderVis() {
-  }
-
-  UpdateVis() {
-    this.RenderVis();
+        .attr("d", vis.path);
   }
 }

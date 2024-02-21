@@ -57,25 +57,36 @@ Promise.all([
 
     histogram1 = new Histogram({
         parentElement: '#histogram1',
+        containerWidth: 600,
+        containerHeight: 300,
+
     }, geo);
     histogram1.UpdateVis(selector1Column);
 
     histogram2 = new Histogram({
-        parentElement: '#histogram2'
+        parentElement: '#histogram2',
+        containerWidth: 600,
+        containerHeight: 300,
     }, geo);
     histogram2.UpdateVis(selector2Column);
 
     scatterplot = new Scatterplot({
-        parentElement: '#scatterplot1'
+        parentElement: '#scatterplot1',
+        containerWidth: 600,
+        containerHeight: 300,
     }, geo);
     scatterplot.UpdateVis(selector1Column, selector2Column);
 
-    /*
     countyMap1 = new CountyMap({
         parentElement: '#countymap1',
-    }, geo, );
-    //countyMap1.UpdateVis();
-    */
+    }, geo);
+    countyMap1.UpdateVis(selector1Column);
+
+    countyMap2 = new CountyMap({
+        parentElement: '#countymap2',
+    }, geo);
+    countyMap2.UpdateVis(selector2Column);
+    
 
     // Listening for selectors
     
@@ -85,6 +96,7 @@ Promise.all([
             console.log(this.value)
             selector1Column = this.value;
             histogram1.UpdateVis(selector1Column);
+            countyMap1.UpdateVis(selector1Column);
             scatterplot.UpdateVis(selector1Column, selector2Column);
         });
 
@@ -94,6 +106,7 @@ Promise.all([
             console.log(this.value)
             selector2Column = this.value;
             histogram2.UpdateVis(selector2Column);
+            countyMap2.UpdateVis(selector2Column);
             scatterplot.UpdateVis(selector1Column, selector2Column);
         });
     
