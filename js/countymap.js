@@ -61,6 +61,13 @@ class CountyMap {
     console.log(vis.counties)
 
     vis.projection.fitSize([vis.width, vis.height], vis.counties);
+
+    vis.counties = vis.g.append("g")
+        .attr("id", "counties")
+        .selectAll("path")
+        .data(topojson.feature(vis.us, vis.us.objects.counties).features)
+        .enter().append("path")
+        .attr("d", vis.path);
   }
 
   UpdateVis(selectedAttribute) {
@@ -82,16 +89,14 @@ class CountyMap {
 
     console.log(vis.counties.features)
 
-    vis.counties = vis.g.append("g")
-        .attr("id", "counties")
-        .selectAll("path")
-        .data(topojson.feature(vis.us, vis.us.objects.counties).features)
-        .enter().append("path")
-        .attr("d", vis.path)
+    //vis.counties.attr('fill', 'steelblue');
+
+    vis.counties
         .attr('fill', d => {
               if (d.properties[vis.attribute] > 0) {
                 return vis.colorScale(d.properties[vis.attribute]);
-              } else {
+              } 
+              else {
                 console.log(d.properties[vis.attribute])
                 return 'url(#lightstripe)';
               }

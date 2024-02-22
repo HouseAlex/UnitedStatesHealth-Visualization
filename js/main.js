@@ -56,9 +56,9 @@ Promise.all([
                 //console.log('test')
             } 
         }
-        if (element.properties.display_name === undefined){
+        if (element.properties.median_household_income == -1){
             //console.log(index);
-            notDisplaying.push(index);
+            notDisplaying.push(element.properties);
         }
     });
     /*
@@ -68,6 +68,7 @@ Promise.all([
         geo.objects.counties.geometries.splice(notDisplaying[i], 1);
     }*/
     //console.log(geo.objects.counties.geometries)
+    console.log(notDisplaying)
     histogram1 = new Histogram({
         parentElement: '#histogram1',
         containerWidth: 600,
@@ -111,6 +112,7 @@ Promise.all([
         .on("change", function() {
             console.log('switch')
             console.log(this.value)
+            ResetDataFilter();
             selector1Column = this.value;
             histogram1.UpdateVis(selector1Column);
             countyMap1.UpdateVis(selector1Column);
@@ -121,6 +123,7 @@ Promise.all([
         .on("change", function() {
             console.log('switch')
             console.log(this.value)
+            ResetDataFilter();
             selector2Column = this.value;
             histogram2.UpdateVis(selector2Column);
             countyMap2.UpdateVis(selector2Column);
@@ -137,4 +140,14 @@ function filterData() {
     else {
 
     }
+}
+
+function ResetDataFilter() {
+    histogram1.data = data;
+    histogram2.data = data;
+    scatterplot.data = data;
+    //! These might not work for maps, because of US data.
+    countyMap1.data = data;
+    countyMap2.data = data;
+
 }
