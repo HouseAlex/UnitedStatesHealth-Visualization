@@ -96,7 +96,7 @@ class Histogram {
             .style("fill", "steelblue")
 
         bins.on("mouseover", (event, d) => {
-            console.log('test')
+            //console.log('test')
             d3.select('#tooltip')
               .style('display', 'block')
               .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   

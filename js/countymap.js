@@ -18,7 +18,7 @@ class CountyMap {
 
     this.us = _data;
 
-    this.active = d3.select(null);
+    //this.active = d3.select(null);
 
     this.InitVis();
   }
@@ -32,6 +32,12 @@ class CountyMap {
     vis.svg = d3.select(vis.config.parentElement).append('svg')
         .attr('width', vis.config.containerWidth)
         .attr('height', vis.config.containerHeight);
+
+    // Color Scale
+    //! Re-map color scales later
+    vis.colorScale = d3.scaleLinear()
+        .range(['#cfe2f2', '#0d306b'])
+        .interpolate(d3.interpolateHcl);
 
     vis.svg.append('rect')
         .attr('class', 'background center-container')
@@ -50,6 +56,11 @@ class CountyMap {
         .attr('transform', 'translate('+vis.config.margin.left+','+vis.config.margin.top+')')
         .attr('width', vis.width + vis.config.margin.left + vis.config.margin.right)
         .attr('height', vis.height + vis.config.margin.top + vis.config.margin.bottom)
+
+    vis.counties = topojson.feature(vis.us, vis.us.objects.counties);
+    console.log(vis.counties)
+
+    vis.projection.fitSize([vis.width, vis.height], vis.counties);
   }
 
   UpdateVis(selectedAttribute) {
@@ -57,20 +68,19 @@ class CountyMap {
 
     vis.attribute = selectedAttribute;
 
-    const filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.attribute] > 0);
-    console.log(vis.attribute);
+    const filteredDataForColoring = vis.data.objects.counties.geometries.filter(d => d.properties[vis.attribute] > 0);
+    vis.filteredData = vis.data.objects.counties.geometries//.filter(d => d.properties[vis.attribute] > 0);
+    //console.log(vis.attribute);
 
-    //! Re-map color scales later
-    vis.colorScale = d3.scaleLinear()
-        .domain(d3.extent(filteredData, d => d.properties[vis.attribute]))
-        .range(['#cfe2f2', '#0d306b'])
-        .interpolate(d3.interpolateHcl);
-
+    vis.colorScale.domain(d3.extent(filteredDataForColoring, d => d.properties[vis.attribute]))
+        
     vis.RenderVis();
   }
 
   RenderVis() {
     let vis = this;
+
+    console.log(vis.counties.features)
 
     vis.counties = vis.g.append("g")
         .attr("id", "counties")
@@ -79,15 +89,16 @@ class CountyMap {
         .enter().append("path")
         .attr("d", vis.path)
         .attr('fill', d => {
-              if (d.properties[vis.attribute]) {
+              if (d.properties[vis.attribute] > 0) {
                 return vis.colorScale(d.properties[vis.attribute]);
               } else {
+                console.log(d.properties[vis.attribute])
                 return 'url(#lightstripe)';
               }
             });
 
     vis.counties.on('mousemove', (event, d) => {
-          const popDensity = d.properties[vis.attribute] ? `<strong>${d.properties[vis.attribute]}</strong>` : 'No data available'; 
+          const popDensity = d.properties[vis.attribute] > 0? `<strong>${d.properties[vis.attribute]}</strong>` : 'No data available'; 
           d3.select('#tooltip')
             .style('display', 'block')
             .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   

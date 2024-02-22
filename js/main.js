@@ -30,7 +30,8 @@ Promise.all([
         .text(d => d.displayName);
 
     // Prepping the data
-    geo.objects.counties.geometries.forEach(element => {
+    notDisplaying = []
+    geo.objects.counties.geometries.forEach( (element, index) => {
         for (let i = 0; i < healthData.length; i++){
             if (element.id === healthData[i].cnty_fips) {
                 element.properties.display_name = healthData[i].display_name;
@@ -51,10 +52,21 @@ Promise.all([
                 element.properties.percent_stroke = +healthData[i].percent_stroke;
                 element.properties.percent_high_cholesterol = +healthData[i].percent_high_cholesterol;
                 element.properties.selectedAttribute = +healthData[i].median_household_income;
-            }
+                //console.log('test')
+            } 
+        }
+        if (element.properties.display_name === undefined){
+            //console.log(index);
+            notDisplaying.push(index);
         }
     });
-
+    /*
+    //console.log(notDisplaying)
+    for (let i = 0; i < notDisplaying.length; i++) {
+        console.log(geo.objects.counties.geometries[notDisplaying[i]].properties)
+        geo.objects.counties.geometries.splice(notDisplaying[i], 1);
+    }*/
+    //console.log(geo.objects.counties.geometries)
     histogram1 = new Histogram({
         parentElement: '#histogram1',
         containerWidth: 600,
@@ -63,6 +75,7 @@ Promise.all([
     }, geo);
     histogram1.UpdateVis(selector1Column);
 
+    //console.log(geo.objects.counties.geometries)
     histogram2 = new Histogram({
         parentElement: '#histogram2',
         containerWidth: 600,
@@ -70,6 +83,7 @@ Promise.all([
     }, geo);
     histogram2.UpdateVis(selector2Column);
 
+    //console.log(geo.objects.counties.geometries)
     scatterplot = new Scatterplot({
         parentElement: '#scatterplot1',
         containerWidth: 600,
@@ -77,11 +91,13 @@ Promise.all([
     }, geo);
     scatterplot.UpdateVis(selector1Column, selector2Column);
 
+    //console.log(geo.objects.counties.geometries)
     countyMap1 = new CountyMap({
         parentElement: '#countymap1',
     }, geo);
     countyMap1.UpdateVis(selector1Column);
 
+    //console.log(geo.objects.counties.geometries)
     countyMap2 = new CountyMap({
         parentElement: '#countymap2',
     }, geo);
