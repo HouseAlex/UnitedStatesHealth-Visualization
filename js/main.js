@@ -1,11 +1,12 @@
-let histogram1, histogram2, countyMap1, countyMap2, scatterplot
+let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo
+let countyFilter = [];
 
 Promise.all([
     d3.json('data/counties-10m.json'),
     d3.csv('data/national_health_data.csv'),
     d3.json('data/additional_data_info.json')
 ]).then(data => {
-    const geo = data[0];
+    geo = data[0];
     const healthData = data[1];
     const options = data[2];
 
@@ -128,3 +129,12 @@ Promise.all([
     
 })
 .catch(error => console.log(error));
+
+function filterData() {
+    if (countyFilter.length == 0) {
+
+    }
+    else {
+
+    }
+}
