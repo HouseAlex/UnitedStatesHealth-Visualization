@@ -1,6 +1,8 @@
 let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo
 let countyFilter = [];
 
+const dispatcher = d3.dispatch('filterVisualizations')
+
 Promise.all([
     d3.json('data/counties-10m.json'),
     d3.csv('data/national_health_data.csv'),
@@ -133,14 +135,19 @@ Promise.all([
 })
 .catch(error => console.log(error));
 
-function filterData() {
-    if (countyFilter.length == 0) {
-
+d3.dispatcher('filterVisualizations', (selectedCounties, visualization) => {
+    if (selectedCounties.length == 0){
+        ResetDataFilter();
     }
     else {
+        let filteredGeometries = geo.objects.counties.geometries.filter(d => selectedCounties.includes(d.id));
 
+        if (visualization !== 'histogram1') {
+            histogram1.data.objects.counties.geometries = filteredGeometries;
+            histogram1.UpdateVis(selector1Column);
+        }
     }
-}
+})
 
 function ResetDataFilter() {
     histogram1.data = data;
