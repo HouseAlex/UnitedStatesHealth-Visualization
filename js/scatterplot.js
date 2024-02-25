@@ -65,8 +65,8 @@ class Scatterplot {
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.xValue] > 0 && d.properties[vis.yValue] > 0)
         //console.log(vis.filteredData)
 
-        vis.xScale.domain([0,d3.max(vis.filteredData, d => d.properties[vis.xValue])]);
-        vis.yScale.domain([0,d3.max(vis.filteredData, d => d.properties[vis.yValue])]);
+        vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.xValue]));
+        vis.yScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.yValue]));
 
         vis.RenderVis();
     }

@@ -1,5 +1,5 @@
 class Histogram {
-    constructor(_config, _data) {
+    constructor(_config, _dispatcher, _data) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 1000,
@@ -9,6 +9,7 @@ class Histogram {
         }
 
         this.data = _data;
+        this.dispatcher = _dispatcher;
 
         this.InitVis();
     }
@@ -31,11 +32,13 @@ class Histogram {
 
         // Initialize X Scale
         vis.xScale = d3.scaleLinear()
-            .range([0, vis.width]);
+            .range([0, vis.width])
+            .nice();
 
         // Initialize Y Scale
         vis.yScale = d3.scaleLinear()
-            .range([vis.height, 0]);
+            .range([vis.height, 0])
+            .nice();
 
         // Create Axis
         vis.xAxis = d3.axisBottom(vis.xScale);
@@ -51,18 +54,46 @@ class Histogram {
             .attr('transform', `translate(0, ${vis.height})`);
 
         vis.yAxisGroup = vis.chart.append('g')
-            .attr('class', 'axis y-axis')
+            .attr('class', 'axis y-axis');
+
+        vis.brush = d3.brushX()
+            .extent([[0,0], [vis.config.containerWidth, vis.height]])
+            .on('brush', function({selection}) {
+              if (selection) vis.BrushMoved(selection);
+            })
+            .on('end', function({selection}) {
+              if (!selection) vis.Brushed(null);
+            });
+
+        vis.brushG = vis.svg.append('g')
+            .attr('class', 'brush x-brush')
+            .style('opacity', .5)
+            .style("pointer-events", "all")
+            .call(vis.brush);
+
+        /*// Create a separate overlay for brushing
+        vis.overlay = vis.svg.append("rect")
+            .attr("class", "overlay")
+            .attr("width", vis.config.containerWidth)
+            .attr("height", vis.height)
+            .style("fill", "none")
+            .style("pointer-events", "all") // Enable mouse events on the overlay
+            .call(vis.brush);*/
+
+        vis.brushTimer = null;
     }    
 
     UpdateVis(column) {
         let vis = this;
 
-        console.log(column)
+        //console.log(column)
+        vis.column = column
 
         // ! THIS WILL NEED TO CHANGE I THINK
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[column] > 0);
 
         vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[column]))
+        console.log(this.filteredData)
         /* 
         TODO Possibly Fix widths or remove
         const spacing = 200;
@@ -109,8 +140,37 @@ class Histogram {
                 d3.select('#tooltip').style('display', 'none')
             })
         
-        vis.xAxisGroup.call(vis.xAxis)
+        vis.xAxisGroup.call(vis.xAxis);
 
-        vis.yAxisGroup.call(vis.yAxis)
+        vis.yAxisGroup.call(vis.yAxis);
+    }
+
+    BrushMoved(selection) {
+        let vis = this;
+        clearTimeout(vis.brushTimer);
+
+        vis.brushTimer = setTimeout(() => {
+            vis.Brushed(selection);
+        }, 300)
+    }
+
+    Brushed(selection) {
+        let vis = this;
+
+        clearTimeout(vis.brushTimer);
+        if (selection) {
+            const selectedx0 =vis.xScale.invert(selection[0] - 50);
+            const selectedx1 = vis.xScale.invert(selection[1] - 50);
+
+            const geos = vis.data.objects.counties.geometries.filter(d => d.properties[vis.column] >= selectedx0 && d.properties[vis.column] <= selectedx1)
+            const countyIds = geos.map(d => d.id)
+            vis.dispatcher.call('filterVisualizations', vis.event, countyIds, vis.config.parentElement)
+            
+        }
+        if (!selection) {
+            console.log('end')
+            vis.dispatcher.call('reset', vis.event)
+        }
+        
     }
 }

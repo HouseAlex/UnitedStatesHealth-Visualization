@@ -58,7 +58,7 @@ class CountyMap {
         .attr('height', vis.height + vis.config.margin.top + vis.config.margin.bottom)
 
     vis.counties = topojson.feature(vis.us, vis.us.objects.counties);
-    console.log(vis.counties)
+    //console.log(vis.counties)
 
     vis.projection.fitSize([vis.width, vis.height], vis.counties);
 
@@ -68,39 +68,59 @@ class CountyMap {
         .data(topojson.feature(vis.us, vis.us.objects.counties).features)
         .enter().append("path")
         .attr("d", vis.path);
+
+    vis.filterHighlights = false;
   }
 
-  UpdateVis(selectedAttribute) {
+  UpdateVis(selectedAttribute, isFiltered) {
     let vis = this;
 
     vis.attribute = selectedAttribute;
-
-    const filteredDataForColoring = vis.data.objects.counties.geometries.filter(d => d.properties[vis.attribute] > 0);
+    vis.filterHighlights = isFiltered;
+    if (vis.filterHighlights){
+      vis.geoColorScaleData = vis.data.objects.counties.geometries;
+    }
+    const filteredDataForColoring = vis.data.objects.counties.geometries.filter(d => (!vis.filterHighlights || (vis.filterHighlights && d.properties.highlight) && d.properties[vis.attribute] > 0));
+    //console.log(filteredDataForColoring)
     vis.filteredData = vis.data.objects.counties.geometries//.filter(d => d.properties[vis.attribute] > 0);
     //console.log(vis.attribute);
-
     vis.colorScale.domain(d3.extent(filteredDataForColoring, d => d.properties[vis.attribute]))
-        
     vis.RenderVis();
   }
 
   RenderVis() {
     let vis = this;
 
-    console.log(vis.counties.features)
+    //console.log(vis.counties.features)
 
     //vis.counties.attr('fill', 'steelblue');
+    //console.log(topojson.feature(vis.us, vis.us.objects.counties).features)
 
-    vis.counties
+    vis.counties = vis.g.append("g")
+        .attr("id", "counties")
+        .selectAll("path")
+        .data(topojson.feature(vis.us, vis.us.objects.counties).features)
+        .enter().append("path")
+        .attr("d", vis.path)
         .attr('fill', d => {
+          if (!vis.filterHighlights) {
               if (d.properties[vis.attribute] > 0) {
                 return vis.colorScale(d.properties[vis.attribute]);
               } 
               else {
-                console.log(d.properties[vis.attribute])
+                //console.log(d.properties[vis.attribute])
                 return 'url(#lightstripe)';
               }
-            });
+          }
+          else {
+            if (d.properties.highlight) {
+              return vis.colorScale(d.properties[vis.attribute]);
+            }
+            else {
+              return 'grey'
+            }
+          }
+        });
 
     vis.counties.on('mousemove', (event, d) => {
           const popDensity = d.properties[vis.attribute] > 0? `<strong>${d.properties[vis.attribute]}</strong>` : 'No data available'; 
@@ -108,10 +128,14 @@ class CountyMap {
             .style('display', 'block')
             .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
             .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-            .html(`
-              <div class="tooltip-title">${d.properties.display_name}</div>
-              <div>${popDensity}</div>
-            `);
+            .html(() => {
+              if (!vis.filterHighlights || (vis.filterHighlights && d.properties.highlight)){
+                return `
+                  <div class="tooltip-title">${d.properties.display_name}</div>
+                  <div>${popDensity}</div>`
+              }
+              return `<div class="tooltip-title">County not present in selection range</div>`
+            });
         })
         .on('mouseleave', () => {
           d3.select('#tooltip').style('display', 'none');
