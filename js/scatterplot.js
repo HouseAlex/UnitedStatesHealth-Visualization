@@ -98,7 +98,7 @@ class Scatterplot {
             .attr('r', 4)
             .attr('cy', d => vis.yScale(d.properties[vis.yValue]))
             .attr('cx', d => vis.xScale(d.properties[vis.xValue]))
-            .attr('fill', 'steelblue');
+            .attr('fill', '#588481');
 
         circles.on('mouseover', (event, d) => {
             d3.select('#tooltip')
