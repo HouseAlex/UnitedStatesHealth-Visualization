@@ -2,81 +2,121 @@
     {
         "attributeName": "poverty_perc",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#e4ece1", "#457f37"],
         "displayName": "Poverty %",
-        "mainColor": "",
+        "mainColor": "#94b589",
         "unit": "%"
     },
     {
         "attributeName": "median_household_income",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#efdcd9","#770313"],
         "displayName": "Median Household Income",
-        "mainColor": "",
+        "mainColor": "#b9766e",
         "unit": "$"
     },
     {
         "attributeName": "education_less_than_high_school_percent",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#f0ebe9","#97776f"],
         "displayName": "Education Less Than High School %",
-        "mainColor": "",
+        "mainColor": "#c3afaa",
         "unit": "% of Pop."
     },
     {
         "attributeName": "air_quality",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#eedeee", "#7e0887"],
         "displayName": "Air Quality",
-        "mainColor": "",
+        "mainColor": "#b97cba",
         "unit": ""
     },
     {
         "attributeName": "park_access",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#55C978","#153C21"],
         "displayName": "Park Access",
-        "mainColor": "",
+        "mainColor": "#2E894A",
         "unit": ""
     },
     {
         "attributeName": "percent_inactive",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#e7faf6", "#1ad5c4"],
         "displayName": "Inactive %",
-        "mainColor": "",
+        "mainColor": "#9ae8dd",
         "unit": "%"
     },
     {
         "attributeName": "percent_smoking",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#e7f3fc","#17ace9"],
         "displayName": "Smoking %",
-        "mainColor": "",
+        "mainColor": "#98cff3",
         "unit": "%"
     },
     {
         "attributeName": "elderly_percentage",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#e3e0f1", "#323b9b"],
         "displayName": "Elderly %",
-        "mainColor": "",
+        "mainColor": "#8f89c6",
         "unit": "%"
     },
     {
         "attributeName": "number_of_hospitals",
         "axisPrefer": "",
-        "colorScale": [],
+        "colorScale": ["#e8e0e8","#633269"],
         "displayName": "Hospital Count",
-        "mainColor": "",
+        "mainColor": "#a585a7",
         "unit": ""
     },
     {
-        "attributeName": "",
+        "attributeName": "number_of_primary_care_physicians",
         "axisPrefer": "",
-        "colorScale": [],
-        "displayName": "",
-        "mainColor": "",
+        "colorScale": ["#e1e6e7","#385d5f"],
+        "displayName": "Primary Care Physician Count",
+        "mainColor": "#8a9fa0",
         "unit": ""
+    },
+    {
+        "attributeName": "percent_no_heath_insurance",
+        "axisPrefer": "",
+        "colorScale": ["#edf2fd", "#7aa7ee"],
+        "displayName": "No Health Insurance %",
+        "mainColor": "#b6ccf6",
+        "unit": "%"
+    },
+    {
+        "attributeName": "percent_high_blood_pressure",
+        "axisPrefer": "",
+        "colorScale": ["#f8f3e2", "#c3b035"],
+        "displayName": "High Blood Pressure %",
+        "mainColor": "#e0d18e",
+        "unit": "%"
+    },
+    {
+        "attributeName": "percent_coronary_heart_disease",
+        "axisPrefer": "",
+        "colorScale": ["#f4ddd9","#8e0713"],
+        "displayName": "Coronary Heart Disease %",
+        "mainColor": "#c87c6f",
+        "unit": "%"
+    },
+    {
+        "attributeName": "percent_stroke",
+        "axisPrefer": "",
+        "colorScale": ["#fbebea","#d37877"],
+        "displayName": "Stroke %",
+        "mainColor": "#eab2af",
+        "unit": "%"
+    },
+    {
+        "attributeName": "percent_high_cholesterol",
+        "axisPrefer": "",
+        "colorScale": ["#fee3da","#c73007"],
+        "displayName": "",
+        "mainColor": "#eb8f6f",
+        "unit": "%"
     }
 ]

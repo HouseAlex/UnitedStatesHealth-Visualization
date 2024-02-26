@@ -28,6 +28,10 @@ stroke-linecap: round;
 pointer-events: none;
 }
 
+.county:hover {
+  stroke: #333;
+}
+
 .county-boundary {
 fill: gray;
 stroke: #fff;
@@ -59,4 +63,18 @@ fill: orange;
   #tooltip ul {
     margin: 5px 0 0 0;
     padding-left: 20px;
+  }
+
+
+  .axis-title {
+    font-size: 15px;
+    fill: #888;
+  }
+
+  .legend-title {
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .legend-label {
+    font-size: .8rem;
   }
