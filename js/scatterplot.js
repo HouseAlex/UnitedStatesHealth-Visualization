@@ -67,7 +67,25 @@ class Scatterplot {
             .attr('class', 'axis-title')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('dy', '.71em')
+            .attr('dy', '.71em');
+
+        
+        vis.brush = d3.brush()
+            .extent([[0,0], [vis.config.containerWidth, vis.height]])
+            .on('brush', function({selection}) {
+              if (selection) vis.BrushMoved(selection);
+            })
+            .on('end', function({selection}) {
+              if (!selection) vis.Brushed(null);
+            });
+
+        vis.brushG = vis.svg.append('g')
+            .attr('class', 'brush x-brush')
+            .style('opacity', .5)
+            .style("pointer-events", "all")
+            .call(vis.brush);
+        
+        vis.brushTimer = null;
     }
 
     UpdateVis(xColumn, yColumn) {
@@ -90,7 +108,7 @@ class Scatterplot {
 
     RenderVis() {
         let vis = this;
-        
+        // TODO Add Data Transitions?
         const circles = vis.chart.selectAll('.point')
             .data(vis.filteredData, d => d.properties.display_name)
             .join('circle')
@@ -121,5 +139,40 @@ class Scatterplot {
         vis.xAxisGroup.call(vis.xAxis)
 
         vis.yAxisGroup.call(vis.yAxis)
+    }
+
+    BrushMoved(selection) {
+        let vis = this;
+        clearTimeout(vis.brushTimer);
+
+        vis.brushTimer = setTimeout(() => {
+            vis.Brushed(selection);
+        }, 300)
+    }
+
+    Brushed(selection) {
+        let vis = this;
+
+        clearTimeout(vis.brushTimer);
+        if (selection) {
+            console.log(selection);
+            const selectedData = vis.data.objects.counties.geometries.filter(d =>
+                vis.xScale(d.x) >= selection[0][0] &&
+                vis.xScale(d.x) <= selection[1][0] &&
+                vis.yScale(d.y) >= selection[0][1] &&
+                vis.yScale(d.y) <= selection[1][1]);
+                
+            console.log(selectedData)
+
+            const countyIds = selectedData.map(d => d.id)
+            console.log(countyIds)
+            //vis.dispatcher.call('filterVisualizations', vis.event, countyIds, vis.config.parentElement)
+            
+        }
+        if (!selection) {
+            console.log('end')
+            vis.dispatcher.call('reset', vis.event)
+        }
+        
     }
 }
