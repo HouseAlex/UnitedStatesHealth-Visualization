@@ -9,7 +9,8 @@ class CountyMap {
       legendBottom: 50,
       legendLeft: 50,
       legendRectHeight: 12, 
-      legendRectWidth: 150
+      legendRectWidth: 150,
+      gradientName: _config.gradientName
     };
 
     this.data = _data;
@@ -32,12 +33,6 @@ class CountyMap {
     vis.svg = d3.select(vis.config.parentElement).append('svg')
         .attr('width', vis.config.containerWidth)
         .attr('height', vis.config.containerHeight);
-
-    // Color Scale
-    //! Re-map color scales later
-    vis.colorScale = d3.scaleLinear()
-        .range(['#cfe2f2', '#0d306b'])
-        .interpolate(d3.interpolateHcl);
 
     vis.svg.append('rect')
         .attr('class', 'background center-container')
@@ -62,29 +57,59 @@ class CountyMap {
 
     vis.projection.fitSize([vis.width, vis.height], vis.counties);
 
-    vis.counties = vis.g.append("g")
-        .attr("id", "counties")
-        .selectAll("path")
-        .data(topojson.feature(vis.us, vis.us.objects.counties).features)
-        .enter().append("path")
-        .attr("d", vis.path);
+    // Initialize gradient that we will later use for the legend
+    vis.linearGradient = vis.svg.append('defs').append('linearGradient')
+        .attr("id", vis.config.gradientName);
+
+    // Append legend
+    vis.legend = vis.g.append('g')
+        .attr('class', 'legend')
+        .attr('transform', `translate(${vis.config.legendLeft},${vis.height - vis.config.legendBottom - 100})`);
+    
+    vis.legendRect = vis.legend.append('rect')
+        .attr('width', vis.config.legendRectWidth)
+        .attr('height', vis.config.legendRectHeight);
+
+    vis.legendTitle = vis.legend.append('text')
+        .attr('class', 'legend-title')
+        .attr('dy', '.35em')
+        .attr('y', -10)
 
     vis.filterHighlights = false;
   }
 
-  UpdateVis(selectedAttribute, isFiltered) {
+  UpdateVis(column, isFiltered) {
     let vis = this;
 
-    vis.attribute = selectedAttribute;
+    vis.attribute = column.attributeName;
     vis.filterHighlights = isFiltered;
     if (vis.filterHighlights){
       vis.geoColorScaleData = vis.data.objects.counties.geometries;
     }
-    const filteredDataForColoring = vis.data.objects.counties.geometries.filter(d => (!vis.filterHighlights || (vis.filterHighlights && d.properties.highlight) && d.properties[vis.attribute] > 0));
+    const filteredDataForColoring = vis.data.objects.counties.geometries.filter(d => ((!vis.filterHighlights  && d.properties[vis.attribute] > 0) || (vis.filterHighlights && d.properties.highlight) && d.properties[vis.attribute] > 0));
     //console.log(filteredDataForColoring)
     vis.filteredData = vis.data.objects.counties.geometries//.filter(d => d.properties[vis.attribute] > 0);
     //console.log(vis.attribute);
-    vis.colorScale.domain(d3.extent(filteredDataForColoring, d => d.properties[vis.attribute]))
+    
+    //Extent
+    const ext = d3.extent(filteredDataForColoring, d => d.properties[vis.attribute]);
+
+    const colorMinData = filteredDataForColoring
+
+    // Color Scale
+    vis.colorScale = d3.scaleLinear()
+        .range(column.colorScale)
+        .domain(ext)
+        .interpolate(d3.interpolateHcl);
+
+    // Define begin and end of the color gradient (legend)
+    vis.legendStops = [
+      { color: column.colorScale[0], value: ext[0], offset: 0},
+      { color: column.colorScale[1], value: ext[1], offset: 100},
+    ];
+
+    vis.legendTitle.text(column.displayName)
+
     vis.RenderVis();
   }
 
@@ -113,11 +138,11 @@ class CountyMap {
               }
           }
           else {
-            if (d.properties.highlight) {
+            if (d.properties.highlight && d.properties[vis.attribute] > 0) {
               return vis.colorScale(d.properties[vis.attribute]);
             }
             else {
-              return 'grey'
+              return 'url(#lightstripe)'
             }
           }
         });
@@ -147,5 +172,28 @@ class CountyMap {
         .datum(topojson.mesh(vis.us, vis.us.objects.states, function(a, b) { return a !== b; }))
         .attr("id", "state-borders")
         .attr("d", vis.path);
+
+    // Add legend labels
+    vis.legend.selectAll('.legend-label')
+        .data(vis.legendStops)
+      .join('text')
+        .attr('class', 'legend-label')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '.35em')
+        .attr('y', 20)
+        .attr('x', (d,index) => {
+          return index == 0 ? 0 : vis.config.legendRectWidth;
+        })
+        .text(d => d.value);
+        
+    console.log(vis.legendStops)
+    // Update gradient for legend
+    vis.linearGradient.selectAll('stop')
+        .data(vis.legendStops)
+      .join('stop')
+        .attr('offset', d => d.offset)
+        .attr('stop-color', d => d.color);
+
+    vis.legendRect.style('fill', `url(#${vis.config.gradientName})`);
   }
 }

@@ -1,4 +1,4 @@
-let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo, geoOriginal, selector1Column, selector2Column
+let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo, geoOriginal, selector1Column, selector2Column, option1, option2
 let countyFilter = [];
 
 const dispatcher = d3.dispatch('filterVisualizations', 'reset')
@@ -16,6 +16,9 @@ Promise.all([
     // default selected
     selector1Column = options[0].attributeName;
     selector2Column = options[1].attributeName;
+    
+    option1 = options.find(d => d.attributeName == selector1Column)
+    option2 = options.find(d => d.attributeName == selector2Column)
 
     // ! Fix default displayed attribute of 2nd selects
     // Attribute Selectors
@@ -79,7 +82,8 @@ Promise.all([
         containerHeight: 300,
 
     },dispatcher, geo);
-    histogram1.UpdateVis(selector1Column);
+    console.log(options)
+    histogram1.UpdateVis(option1);
 
     //console.log(geo.objects.counties.geometries)
     histogram2 = new Histogram({
@@ -87,7 +91,7 @@ Promise.all([
         containerWidth: 600,
         containerHeight: 300,
     },dispatcher, geo);
-    histogram2.UpdateVis(selector2Column);
+    histogram2.UpdateVis(option2);
 
     //console.log(geo.objects.counties.geometries)
     scatterplot = new Scatterplot({
@@ -95,19 +99,21 @@ Promise.all([
         containerWidth: 600,
         containerHeight: 300,
     }, geo);
-    scatterplot.UpdateVis(selector1Column, selector2Column);
+    scatterplot.UpdateVis(option1, option2);
 
     //console.log(geo.objects.counties.geometries)
     countyMap1 = new CountyMap({
         parentElement: '#countymap1',
+        gradientName: 'gradient1'
     }, geo);
-    countyMap1.UpdateVis(selector1Column, false);
+    countyMap1.UpdateVis(option1, false);
 
     //console.log(geo.objects.counties.geometries)
     countyMap2 = new CountyMap({
         parentElement: '#countymap2',
+        gradientName: 'gradient2'
     }, geo);
-    countyMap2.UpdateVis(selector2Column, false);
+    countyMap2.UpdateVis(option2, false);
     
 
     // Listening for selectors
@@ -116,18 +122,20 @@ Promise.all([
         .on("change", function() {
             ResetDataFilter();
             selector1Column = this.value;
-            histogram1.UpdateVis(selector1Column);
-            countyMap1.UpdateVis(selector1Column, false);
-            scatterplot.UpdateVis(selector1Column, selector2Column);
+            option1 = options.find(d => d.attributeName == selector1Column)
+            histogram1.UpdateVis(option1);
+            countyMap1.UpdateVis(option1, false);
+            scatterplot.UpdateVis(option1, option2);
         });
 
     d3.select("#columnSelector2")
         .on("change", function() {
             ResetDataFilter();
             selector2Column = this.value;
-            histogram2.UpdateVis(selector2Column);
-            countyMap2.UpdateVis(selector2Column, false);
-            scatterplot.UpdateVis(selector1Column, selector2Column);
+            option2 = options.find(d => d.attributeName == selector2Column)
+            histogram2.UpdateVis(option2);
+            countyMap2.UpdateVis(option2, false);
+            scatterplot.UpdateVis(option1, option2);
         });
     
 })
@@ -145,18 +153,18 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
         if (visualization !== '#histogram1') {
             //console.log('test1')
             histogram1.data.objects.counties.geometries = filteredGeometries;
-            histogram1.UpdateVis(selector1Column);
+            histogram1.UpdateVis(option1);
         }
 
         if (visualization !== '#histogram2') {
             //console.log('test2')
             histogram2.data.objects.counties.geometries = filteredGeometries;
-            histogram2.UpdateVis(selector2Column);
+            histogram2.UpdateVis(option2);
         }
 
         if (visualization !== '#scatterplot') {
             scatterplot.data.objects.counties.geometries = filteredGeometries;
-            scatterplot.UpdateVis(selector1Column,selector2Column)
+            scatterplot.UpdateVis(option1, option2)
         }
 
         const highlightData = JSON.parse(JSON.stringify(geoOriginal));
@@ -165,13 +173,13 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
         if (visualization !== '#countymap1') {
             countyMap1.data.objects.counties.geometries = filteredGeometries;
             countyMap1.us.objects.counties.geometries = highlightData;
-            countyMap1.UpdateVis(selector1Column, true)
+            countyMap1.UpdateVis(option1, true)
         }
 
         if (visualization !== '#countymap2') {
             countyMap2.data.objects.counties.geometries = filteredGeometries;
             countyMap2.us.objects.counties.geometries = highlightData;
-            countyMap2.UpdateVis(selector1Column, true)
+            countyMap2.UpdateVis(option2, true)
         }
     }
 })
@@ -182,8 +190,6 @@ dispatcher.on('reset', () => {
 })
 
 function ResetDataFilter() {
-    console.log(histogram1.data.objects.counties.geometries)
-    console.log(geoOriginal)
     histogram1.data.objects.counties.geometries = geoOriginal;
     histogram2.data.objects.counties.geometries = geoOriginal;
     scatterplot.data.objects.counties.geometries = geoOriginal;
@@ -196,9 +202,9 @@ function ResetDataFilter() {
 }
 
 function RefreshVisualizations() {
-    histogram1.UpdateVis(selector1Column);
-    histogram2.UpdateVis(selector2Column);
-    scatterplot.UpdateVis(selector1Column, selector2Column);
-    countyMap1.UpdateVis(selector1Column, false);
-    countyMap2.UpdateVis(selector2Column, false);
+    histogram1.UpdateVis(option1);
+    histogram2.UpdateVis(option2);
+    scatterplot.UpdateVis(option1, option2);
+    countyMap1.UpdateVis(option1, false);
+    countyMap2.UpdateVis(option2, false);
 }

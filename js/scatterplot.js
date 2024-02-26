@@ -54,19 +54,36 @@ class Scatterplot {
         // Append y-axis group
         vis.yAxisGroup = vis.chart.append('g')
             .attr('class', 'axis y-axis');
+
+        // Append both axis titles
+        vis.xTitle = vis.chart.append('text')
+            .attr('class', 'axis-title')
+            .attr('y', vis.height - 15)
+            .attr('x', vis.width + 10)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+
+        vis.yTitle = vis.svg.append('text')
+            .attr('class', 'axis-title')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('dy', '.71em')
     }
 
     UpdateVis(xColumn, yColumn) {
         let vis = this;
 
-        vis.xValue = xColumn;
-        vis.yValue = yColumn;
+        vis.xValue = xColumn.attributeName;
+        vis.yValue = yColumn.attributeName;
 
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.xValue] > 0 && d.properties[vis.yValue] > 0)
         //console.log(vis.filteredData)
 
         vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.xValue]));
         vis.yScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.yValue]));
+
+        vis.xTitle.text(xColumn.displayName)
+        vis.yTitle.text(yColumn.displayName)
 
         vis.RenderVis();
     }

@@ -55,6 +55,21 @@ class Histogram {
 
         vis.yAxisGroup = vis.chart.append('g')
             .attr('class', 'axis y-axis');
+            
+        // Append both axis titles
+        vis.xTitle = vis.chart.append('text')
+            .attr('class', 'axis-title')
+            .attr('y', vis.height - 15)
+            .attr('x', vis.width + 10)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'end')
+
+        vis.yTitle = vis.svg.append('text')
+            .attr('class', 'axis-title')
+            .attr('x', 0)
+            .attr('y', 10)
+            .attr('dy', '.71em')
+            .text('Count')
 
         vis.brush = d3.brushX()
             .extent([[0,0], [vis.config.containerWidth, vis.height]])
@@ -86,13 +101,14 @@ class Histogram {
     UpdateVis(column) {
         let vis = this;
 
-        //console.log(column)
-        vis.column = column
+        console.log(column)
+        vis.column = column.attributeName;
+        vis.color = column.mainColor;
 
         // ! THIS WILL NEED TO CHANGE I THINK
-        vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[column] > 0);
+        vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.column] > 0);
 
-        vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[column]))
+        vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.column]))
         console.log(this.filteredData)
         /* 
         TODO Possibly Fix widths or remove
@@ -104,7 +120,7 @@ class Histogram {
         vis.bins = d3.histogram()
             .domain(vis.xScale.domain())
             .thresholds(vis.xScale.ticks(20))
-            (vis.filteredData.map(d => d.properties[column]));
+            (vis.filteredData.map(d => d.properties[vis.column]));
 
         vis.yScale.domain([0, d3.max(vis.bins.map(d => d.length))])
 
@@ -124,7 +140,7 @@ class Histogram {
             .attr('y', d => vis.yScale(d.length))
             .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
             .attr("height", d => vis.height - vis.yScale(d.length))
-            .style("fill", "steelblue")
+            .style("fill", vis.color)
 
         bins.on("mouseover", (event, d) => {
             //console.log('test')
