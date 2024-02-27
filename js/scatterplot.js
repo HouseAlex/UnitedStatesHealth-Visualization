@@ -1,5 +1,5 @@
 class Scatterplot {
-    constructor(_config, _data) {
+    constructor(_config,_dispatcher, _data) {
         this.config = {
           parentElement: _config.parentElement,
           colorScale: _config.colorScale,
@@ -9,6 +9,7 @@ class Scatterplot {
           tooltipPadding: _config.tooltipPadding || 15
         }
         this.data = _data;
+        this.dispatcher = _dispatcher;
 
         this.InitVis();
     }
@@ -69,7 +70,7 @@ class Scatterplot {
             .attr('y', 0)
             .attr('dy', '.71em');
 
-        
+        /*
         vis.brush = d3.brush()
             .extent([[0,0], [vis.config.containerWidth, vis.height]])
             .on('brush', function({selection}) {
@@ -84,6 +85,7 @@ class Scatterplot {
             .style('opacity', .5)
             .style("pointer-events", "all")
             .call(vis.brush);
+        */
         
         vis.brushTimer = null;
     }
@@ -157,16 +159,16 @@ class Scatterplot {
         if (selection) {
             console.log(selection);
             const selectedData = vis.data.objects.counties.geometries.filter(d =>
-                vis.xScale(d.x) >= selection[0][0] &&
-                vis.xScale(d.x) <= selection[1][0] &&
-                vis.yScale(d.y) >= selection[0][1] &&
-                vis.yScale(d.y) <= selection[1][1]);
+                vis.xScale(d.properties[vis.xValue]) >= selection[0][0] &&
+                vis.xScale(d.properties[vis.xValue]) <= selection[1][0] &&
+                vis.yScale(d.properties[vis.yValue]) >= selection[0][1] &&
+                vis.yScale(d.properties[vis.yValue]) <= selection[1][1]);
                 
             console.log(selectedData)
 
             const countyIds = selectedData.map(d => d.id)
             console.log(countyIds)
-            //vis.dispatcher.call('filterVisualizations', vis.event, countyIds, vis.config.parentElement)
+            vis.dispatcher.call('filterVisualizations', vis.event, countyIds, vis.config.parentElement)
             
         }
         if (!selection) {

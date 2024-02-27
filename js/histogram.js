@@ -69,7 +69,22 @@ class Histogram {
             .attr('x', 0)
             .attr('y', 10)
             .attr('dy', '.71em')
-            .text('Count')
+            .text('Count');
+
+        // Create a separate overlay for mouse events
+        vis.overlay = vis.svg.append("rect")
+            .attr("class", "overlay")
+            .attr("width", vis.width + vis.config.margin.left + vis.config.margin.right)
+            .attr("height", vis.height + vis.config.margin.top + vis.config.margin.bottom)
+            .style("fill", "none")
+            .style("pointer-events", "all"); // Enable mouse events on the overlay
+
+        vis.mouseoverPending = false;
+        
+        // Attach mouseover and mouseleave events to the overlay
+        vis.overlay.on("mousemove", (event) => {
+                vis.MouseMoved(event);
+            });
 
         vis.brush = d3.brushX()
             .extent([[0,0], [vis.config.containerWidth, vis.height]])
@@ -85,16 +100,8 @@ class Histogram {
             .style('opacity', .5)
             .style("pointer-events", "all")
             .call(vis.brush);
-
-        /*// Create a separate overlay for brushing
-        vis.overlay = vis.svg.append("rect")
-            .attr("class", "overlay")
-            .attr("width", vis.config.containerWidth)
-            .attr("height", vis.height)
-            .style("fill", "none")
-            .style("pointer-events", "all") // Enable mouse events on the overlay
-            .call(vis.brush);*/
-
+       
+        vis.mouseMoveTimer = null;
         vis.brushTimer = null;
     }    
 
@@ -141,7 +148,7 @@ class Histogram {
             .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
             .attr("height", d => vis.height - vis.yScale(d.length))
             .style("fill", vis.color)
-
+        /*
         bins.on("mouseover", (event, d) => {
             //console.log('test')
             d3.select('#tooltip')
@@ -154,8 +161,8 @@ class Histogram {
             })
             .on("mouseleave", () => {
                 d3.select('#tooltip').style('display', 'none')
-            })
-        
+            })*/
+
         vis.xAxisGroup.call(vis.xAxis);
 
         vis.yAxisGroup.call(vis.yAxis);
@@ -188,5 +195,32 @@ class Histogram {
             vis.dispatcher.call('reset', vis.event)
         }
         
+    }
+
+    MouseMoved(event) {
+        let vis = this;
+        clearTimeout(vis.mouseMoveTimer);
+        console.log('timer')
+        d3.select('#tooltip').style('display', 'none');
+
+        vis.mouseMoveTimer = setTimeout(() => {
+            vis.MouseStopped(event);
+        }, 300);
+    }
+
+    MouseStopped(event) {
+        let vis = this;
+        clearTimeout(vis.mouseMoveTimer)
+        console.log(event)
+        d3.select('#tooltip')
+              .style('display', 'block')
+              .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+              .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+              .html(`
+              <div>Count: Test</div>
+              <div>Bin Width: Test</div>`)
+              /*.html(`
+                <div>Count: ${d.length}</div>
+                <div>Bin Width: ${d3.min(d)} - ${d3.max(d)}</div>`)*/
     }
 }

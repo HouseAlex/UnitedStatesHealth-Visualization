@@ -36,6 +36,7 @@ Promise.all([
         .attr("value", d => d.attributeName)
         .text(d => d.displayName);
 
+
     // Prepping the data
     notDisplaying = []
     geo.objects.counties.geometries.forEach( (element, index) => {
@@ -98,7 +99,7 @@ Promise.all([
         parentElement: '#scatterplot1',
         containerWidth: 600,
         containerHeight: 300,
-    }, geo);
+    },dispatcher, geo);
     scatterplot.UpdateVis(option1, option2);
 
     //console.log(geo.objects.counties.geometries)
@@ -137,6 +138,9 @@ Promise.all([
             countyMap2.UpdateVis(option2, false);
             scatterplot.UpdateVis(option1, option2);
         });
+
+    // Rural Status Listener
+    d3.selectAll('input[type="checkbox"]').on('change', FilterOnRuralStatus());
     
 })
 .catch(error => console.log(error));
@@ -149,7 +153,8 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
     else {
         const filteredGeometries = geo.objects.counties.geometries.filter(d => selectedCounties.includes(d.id));
         console.log(filteredGeometries)
-        //console.log(geo.objects.counties.geometries)
+        console.log(geo.objects.counties.geometries)
+        console.log(visualization)
         if (visualization !== '#histogram1') {
             //console.log('test1')
             histogram1.data.objects.counties.geometries = filteredGeometries;
@@ -162,7 +167,7 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
             histogram2.UpdateVis(option2);
         }
 
-        if (visualization !== '#scatterplot') {
+        if (visualization !== '#scatterplot1') {
             scatterplot.data.objects.counties.geometries = filteredGeometries;
             scatterplot.UpdateVis(option1, option2)
         }
@@ -188,6 +193,10 @@ dispatcher.on('reset', () => {
     ResetDataFilter();
     RefreshVisualizations();
 })
+
+function FilterOnRuralStatus() {
+    
+}
 
 function ResetDataFilter() {
     histogram1.data.objects.counties.geometries = geoOriginal;
