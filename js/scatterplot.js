@@ -70,7 +70,7 @@ class Scatterplot {
             .attr('y', 0)
             .attr('dy', '.71em');
 
-        /*
+        
         vis.brush = d3.brush()
             .extent([[0,0], [vis.config.containerWidth, vis.height]])
             .on('brush', function({selection}) {
@@ -83,9 +83,9 @@ class Scatterplot {
         vis.brushG = vis.svg.append('g')
             .attr('class', 'brush x-brush')
             .style('opacity', .5)
-            .style("pointer-events", "all")
+            .style('pointer-events', 'all')
             .call(vis.brush);
-        */
+        
         
         vis.brushTimer = null;
     }
@@ -126,7 +126,7 @@ class Scatterplot {
                 .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
                 .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
                 .html(`
-                    <div class="tooltip-title">${d.properties.display_name}</div>
+                    <div class='tooltip-title'>${d.properties.display_name}</div>
                     <ul>
                         <li>x: ${d.properties[vis.xValue]}</li>
                         <li>y: ${d.properties[vis.yValue]}</li>

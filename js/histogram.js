@@ -46,7 +46,7 @@ class Histogram {
         vis.yAxis = d3.axisLeft(vis.yScale)
             .ticks(6)
             .tickSizeOuter(0)   // TODO FIX Y AXIS
-            .tickFormat(d3.format(".0f"));
+            .tickFormat(d3.format('.0f'));
 
         // append axis groups
         vis.xAxisGroup = vis.chart.append('g')
@@ -71,21 +71,6 @@ class Histogram {
             .attr('dy', '.71em')
             .text('Count');
 
-        // Create a separate overlay for mouse events
-        vis.overlay = vis.svg.append("rect")
-            .attr("class", "overlay")
-            .attr("width", vis.width + vis.config.margin.left + vis.config.margin.right)
-            .attr("height", vis.height + vis.config.margin.top + vis.config.margin.bottom)
-            .style("fill", "none")
-            .style("pointer-events", "all"); // Enable mouse events on the overlay
-
-        vis.mouseoverPending = false;
-        
-        // Attach mouseover and mouseleave events to the overlay
-        vis.overlay.on("mousemove", (event) => {
-                vis.MouseMoved(event);
-            });
-
         vis.brush = d3.brushX()
             .extent([[0,0], [vis.config.containerWidth, vis.height]])
             .on('brush', function({selection}) {
@@ -98,7 +83,7 @@ class Histogram {
         vis.brushG = vis.svg.append('g')
             .attr('class', 'brush x-brush')
             .style('opacity', .5)
-            .style("pointer-events", "all")
+            .style('pointer-events', 'all')
             .call(vis.brush);
        
         vis.mouseMoveTimer = null;
@@ -108,15 +93,19 @@ class Histogram {
     UpdateVis(column) {
         let vis = this;
 
-        console.log(column)
+        //console.log(column)
         vis.column = column.attributeName;
         vis.color = column.mainColor;
+
+        const axisTitle = `${column.displayName} ${column.unit != '' ? '(' + column.unit + ')': ''}`
+
+        vis.xTitle.text(axisTitle)
 
         // ! THIS WILL NEED TO CHANGE I THINK
         vis.filteredData = vis.data.objects.counties.geometries.filter(d => d.properties[vis.column] > 0);
 
         vis.xScale.domain(d3.extent(vis.filteredData, d => d.properties[vis.column]))
-        console.log(this.filteredData)
+        //console.log(this.filteredData)
         /* 
         TODO Possibly Fix widths or remove
         const spacing = 200;
@@ -142,14 +131,14 @@ class Histogram {
         const bins = vis.chart.selectAll('rect')
             .data(vis.bins)
             .join('rect')
-            .attr("x", (d, i) => vis.xScale(d.x0)) // TODO Possibly add widths to bins
-            //.attr("x", (d, i) => vis.xScale(d.x0) + i * (binWidth + spacing))
+            .attr('x', (d, i) => vis.xScale(d.x0)) // TODO Possibly add widths to bins
+            //.attr('x', (d, i) => vis.xScale(d.x0) + i * (binWidth + spacing))
             .attr('y', d => vis.yScale(d.length))
-            .attr("width", d => vis.xScale(d.x1) - vis.xScale(d.x0))
-            .attr("height", d => vis.height - vis.yScale(d.length))
-            .style("fill", vis.color)
-        /*
-        bins.on("mouseover", (event, d) => {
+            .attr('width', d => vis.xScale(d.x1) - vis.xScale(d.x0))
+            .attr('height', d => vis.height - vis.yScale(d.length))
+            .style('fill', vis.color)
+        
+        bins.on('mouseover', (event, d) => {
             //console.log('test')
             d3.select('#tooltip')
               .style('display', 'block')
@@ -159,9 +148,9 @@ class Histogram {
                 <div>Count: ${d.length}</div>
                 <div>Bin Width: ${d3.min(d)} - ${d3.max(d)}</div>`)
             })
-            .on("mouseleave", () => {
+            .on('mouseleave', () => {
                 d3.select('#tooltip').style('display', 'none')
-            })*/
+            })
 
         vis.xAxisGroup.call(vis.xAxis);
 
@@ -191,12 +180,12 @@ class Histogram {
             
         }
         if (!selection) {
-            console.log('end')
+            //console.log('end')
             vis.dispatcher.call('reset', vis.event)
         }
         
     }
-
+    /*
     MouseMoved(event) {
         let vis = this;
         clearTimeout(vis.mouseMoveTimer);
@@ -219,8 +208,9 @@ class Histogram {
               .html(`
               <div>Count: Test</div>
               <div>Bin Width: Test</div>`)
-              /*.html(`
+              .html(`
                 <div>Count: ${d.length}</div>
-                <div>Bin Width: ${d3.min(d)} - ${d3.max(d)}</div>`)*/
+                <div>Bin Width: ${d3.min(d)} - ${d3.max(d)}</div>`)
     }
+    */
 }

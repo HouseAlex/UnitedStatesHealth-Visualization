@@ -5,7 +5,7 @@
         "colorScale": ["#e4ece1", "#457f37"],
         "displayName": "Poverty %",
         "mainColor": "#94b589",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "median_household_income",
@@ -21,7 +21,7 @@
         "colorScale": ["#f0ebe9","#97776f"],
         "displayName": "Education Less Than High School %",
         "mainColor": "#c3afaa",
-        "unit": "% of Pop."
+        "unit": ""
     },
     {
         "attributeName": "air_quality",
@@ -45,7 +45,7 @@
         "colorScale": ["#e7faf6", "#1ad5c4"],
         "displayName": "Inactive %",
         "mainColor": "#9ae8dd",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "percent_smoking",
@@ -53,7 +53,7 @@
         "colorScale": ["#e7f3fc","#17ace9"],
         "displayName": "Smoking %",
         "mainColor": "#98cff3",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "elderly_percentage",
@@ -61,7 +61,7 @@
         "colorScale": ["#e3e0f1", "#323b9b"],
         "displayName": "Elderly %",
         "mainColor": "#8f89c6",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "number_of_hospitals",
@@ -85,7 +85,7 @@
         "colorScale": ["#edf2fd", "#7aa7ee"],
         "displayName": "No Health Insurance %",
         "mainColor": "#b6ccf6",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "percent_high_blood_pressure",
@@ -93,7 +93,7 @@
         "colorScale": ["#f8f3e2", "#c3b035"],
         "displayName": "High Blood Pressure %",
         "mainColor": "#e0d18e",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "percent_coronary_heart_disease",
@@ -101,7 +101,7 @@
         "colorScale": ["#f4ddd9","#8e0713"],
         "displayName": "Coronary Heart Disease %",
         "mainColor": "#c87c6f",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "percent_stroke",
@@ -109,14 +109,14 @@
         "colorScale": ["#fbebea","#d37877"],
         "displayName": "Stroke %",
         "mainColor": "#eab2af",
-        "unit": "%"
+        "unit": ""
     },
     {
         "attributeName": "percent_high_cholesterol",
         "axisPrefer": "",
         "colorScale": ["#fee3da","#c73007"],
-        "displayName": "",
+        "displayName": "High Cholesterol %",
         "mainColor": "#eb8f6f",
-        "unit": "%"
+        "unit": ""
     }
 ]

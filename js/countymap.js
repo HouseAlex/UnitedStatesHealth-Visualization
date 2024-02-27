@@ -59,7 +59,7 @@ class CountyMap {
 
     // Initialize gradient that we will later use for the legend
     vis.linearGradient = vis.svg.append('defs').append('linearGradient')
-        .attr("id", vis.config.gradientName);
+        .attr('id', vis.config.gradientName);
 
     // Append legend
     vis.legend = vis.g.append('g')
@@ -82,6 +82,7 @@ class CountyMap {
     let vis = this;
 
     vis.attribute = column.attributeName;
+    vis.displayName = column.displayName;
     vis.filterHighlights = isFiltered;
     if (vis.filterHighlights){
       vis.geoColorScaleData = vis.data.objects.counties.geometries;
@@ -121,12 +122,12 @@ class CountyMap {
     //vis.counties.attr('fill', 'steelblue');
     //console.log(topojson.feature(vis.us, vis.us.objects.counties).features)
 
-    vis.counties = vis.g.append("g")
-        .attr("id", "counties")
-        .selectAll("path")
+    vis.counties = vis.g.append('g')
+        .attr('id', 'counties')
+        .selectAll('path')
         .data(topojson.feature(vis.us, vis.us.objects.counties).features)
-        .enter().append("path")
-        .attr("d", vis.path)
+        .enter().append('path')
+        .attr('d', vis.path)
         .attr('fill', d => {
           if (!vis.filterHighlights) {
               if (d.properties[vis.attribute] > 0) {
@@ -148,7 +149,7 @@ class CountyMap {
         });
 
     vis.counties.on('mousemove', (event, d) => {
-          const popDensity = d.properties[vis.attribute] > 0? `<strong>${d.properties[vis.attribute]}</strong>` : 'No data available'; 
+          const data = d.properties[vis.attribute] > 0? `<strong>${vis.displayName} : ${d.properties[vis.attribute]}</strong>` : 'No data available'; 
           d3.select('#tooltip')
             .style('display', 'block')
             .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
@@ -156,10 +157,10 @@ class CountyMap {
             .html(() => {
               if (!vis.filterHighlights || (vis.filterHighlights && d.properties.highlight)){
                 return `
-                  <div class="tooltip-title">${d.properties.display_name}</div>
-                  <div>${popDensity}</div>`
+                  <div class='tooltip-title'>${d.properties.display_name}</div>
+                  <div>${data}</div>`
               }
-              return `<div class="tooltip-title">County not present in selection range</div>`
+              return `<div class='tooltip-title'>County not present in selection range</div>`
             });
         })
         .on('mouseleave', () => {
@@ -168,10 +169,10 @@ class CountyMap {
 
 
 
-    vis.g.append("path")
+    vis.g.append('path')
         .datum(topojson.mesh(vis.us, vis.us.objects.states, function(a, b) { return a !== b; }))
-        .attr("id", "state-borders")
-        .attr("d", vis.path);
+        .attr('id', 'state-borders')
+        .attr('d', vis.path);
 
     // Add legend labels
     vis.legend.selectAll('.legend-label')
@@ -186,7 +187,7 @@ class CountyMap {
         })
         .text(d => d.value);
         
-    console.log(vis.legendStops)
+    //console.log(vis.legendStops)
     // Update gradient for legend
     vis.linearGradient.selectAll('stop')
         .data(vis.legendStops)
