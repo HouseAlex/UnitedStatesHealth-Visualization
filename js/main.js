@@ -1,4 +1,4 @@
-let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo, geoOriginal, selector1Column, selector2Column, option1, option2
+let histogram1, histogram2, countyMap1, countyMap2, scatterplot, geo, geoOriginal, selector1Column, selector2Column, option1, option2, filteredCounties
 let countyFilter = [];
 
 const dispatcher = d3.dispatch('filterVisualizations', 'reset')
@@ -20,21 +20,24 @@ Promise.all([
     option1 = options.find(d => d.attributeName == selector1Column)
     option2 = options.find(d => d.attributeName == selector2Column)
 
-    // ! Fix default displayed attribute of 2nd selects
     // Attribute Selectors
-    selector1 = d3.select("#columnSelector1")
-        .selectAll("option")
+    selector1 = d3.select('#columnSelector1')
+        .selectAll('option')
         .data(options)
-        .enter().append("option")
-        .attr("value", d => d.attributeName)
+        .enter().append('option')
+        .attr('value', d => d.attributeName)
         .text(d => d.displayName);
 
-    selector2 = d3.select("#columnSelector2")
-        .selectAll("option")
+    selector2 = d3.select('#columnSelector2')
+        .selectAll('option')
         .data(options)
-        .enter().append("option")
-        .attr("value", d => d.attributeName)
+        .enter().append('option')
+        .attr('value', d => d.attributeName)
         .text(d => d.displayName);
+
+    d3.select('#columnSelector2')
+        .property('value', option2.attributeName)
+
 
     // Prepping the data
     notDisplaying = []
@@ -49,7 +52,7 @@ Promise.all([
                 element.properties.park_access = +healthData[i].park_access;
                 element.properties.percent_inactive = +healthData[i].percent_inactive;
                 element.properties.percent_smoking = +healthData[i].percent_smoking;
-                element.properties.urban_rural_status = +healthData[i].urban_rural_status;
+                element.properties.urban_rural_status = healthData[i].urban_rural_status;
                 element.properties.elderly_percentage = +healthData[i].elderly_percentage;
                 element.properties.number_of_hospitals = +healthData[i].number_of_hospitals;
                 element.properties.number_of_primary_care_physicians = +healthData[i].number_of_primary_care_physicians;
@@ -75,7 +78,8 @@ Promise.all([
         geo.objects.counties.geometries.splice(notDisplaying[i], 1);
     }*/
     //console.log(geo.objects.counties.geometries)
-    console.log(notDisplaying)
+    //console.log(notDisplaying)
+
     histogram1 = new Histogram({
         parentElement: '#histogram1',
         containerWidth: 600,
@@ -98,7 +102,7 @@ Promise.all([
         parentElement: '#scatterplot1',
         containerWidth: 600,
         containerHeight: 300,
-    }, geo);
+    },dispatcher, geo);
     scatterplot.UpdateVis(option1, option2);
 
     //console.log(geo.objects.counties.geometries)
@@ -118,9 +122,9 @@ Promise.all([
 
     // Listening for selectors
     
-    d3.select("#columnSelector1")
-        .on("change", function() {
-            ResetDataFilter();
+    d3.select('#columnSelector1')
+        .on('change', function() {
+            ResetDataFilter(true);
             selector1Column = this.value;
             option1 = options.find(d => d.attributeName == selector1Column)
             histogram1.UpdateVis(option1);
@@ -128,15 +132,18 @@ Promise.all([
             scatterplot.UpdateVis(option1, option2);
         });
 
-    d3.select("#columnSelector2")
-        .on("change", function() {
-            ResetDataFilter();
+    d3.select('#columnSelector2')
+        .on('change', function() {
+            ResetDataFilter(true);
             selector2Column = this.value;
             option2 = options.find(d => d.attributeName == selector2Column)
             histogram2.UpdateVis(option2);
             countyMap2.UpdateVis(option2, false);
             scatterplot.UpdateVis(option1, option2);
         });
+
+    // Rural Status Listener
+    d3.selectAll('input[type="checkbox"]').on('change', FilterOnRuralStatus);
     
 })
 .catch(error => console.log(error));
@@ -144,12 +151,14 @@ Promise.all([
 dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
     console.log(selectedCounties)
     if (selectedCounties.length == 0){
-        ResetDataFilter();
+        ResetDataFilter(true);
     }
     else {
+        filteredCounties = selectedCounties
         const filteredGeometries = geo.objects.counties.geometries.filter(d => selectedCounties.includes(d.id));
-        console.log(filteredGeometries)
+        //console.log(filteredGeometries)
         //console.log(geo.objects.counties.geometries)
+        //console.log(visualization)
         if (visualization !== '#histogram1') {
             //console.log('test1')
             histogram1.data.objects.counties.geometries = filteredGeometries;
@@ -162,7 +171,7 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
             histogram2.UpdateVis(option2);
         }
 
-        if (visualization !== '#scatterplot') {
+        if (visualization !== '#scatterplot1') {
             scatterplot.data.objects.counties.geometries = filteredGeometries;
             scatterplot.UpdateVis(option1, option2)
         }
@@ -185,11 +194,53 @@ dispatcher.on('filterVisualizations', (selectedCounties, visualization) => {
 })
 
 dispatcher.on('reset', () => {
-    ResetDataFilter();
+    ResetDataFilter(true);
     RefreshVisualizations();
 })
 
-function ResetDataFilter() {
+function FilterOnRuralStatus() {
+    ResetDataFilter(false);
+    console.log('test');
+    
+    const isRural = d3.select('#ruralCheckbox').property('checked');
+    const isSmallCity = d3.select('#smallCityCheckbox').property('checked');
+    const isSuburban = d3.select('#suburbanCheckbox').property('checked');
+    const isUrban = d3.select('#urbanCheckbox').property('checked');
+
+    console.log(geo.objects.counties.geometries)
+    const filtered = geo.objects.counties.geometries.filter(d => 
+        (d.properties.urban_rural_status === 'Rural' && isRural) ||
+        (d.properties.urban_rural_status === 'Small City' && isSmallCity) ||
+        (d.properties.urban_rural_status === 'Suburban' && isSuburban) ||
+        (d.properties.urban_rural_status === 'Urban' && isUrban))
+    
+    //console.log(filtered)
+
+    histogram1.data.objects.counties.geometries = filtered;
+    histogram2.data.objects.counties.geometries = filtered;
+    scatterplot.data.objects.counties.geometries = filtered;
+    countyMap1.data.objects.counties.geometries = filtered;
+    countyMap2.data.objects.counties.geometries = filtered;
+    
+
+    histogram1.UpdateVis(option1);
+    histogram2.UpdateVis(option2);
+    scatterplot.UpdateVis(option1, option2);
+
+    const highlightData = JSON.parse(JSON.stringify(geoOriginal));
+    highlightData.forEach(d => {
+        if (isRural && d.properties.urban_rural_status === 'Rural') d.properties.highlight = true;
+        if (isSmallCity && d.properties.urban_rural_status === 'Small City') d.properties.highlight = true;
+        if (isSuburban && d.properties.urban_rural_status === 'Suburban') d.properties.highlight = true;
+        if (isUrban && d.properties.urban_rural_status === 'Urban') d.properties.highlight = true;
+    })
+    countyMap1.us.objects.counties.geometries = highlightData;
+    countyMap2.us.objects.counties.geometries = highlightData;
+    countyMap1.UpdateVis(option1, true);
+    countyMap2.UpdateVis(option2, true);
+}
+
+function ResetDataFilter(resetChecks) {
     histogram1.data.objects.counties.geometries = geoOriginal;
     histogram2.data.objects.counties.geometries = geoOriginal;
     scatterplot.data.objects.counties.geometries = geoOriginal;
@@ -199,6 +250,17 @@ function ResetDataFilter() {
     countyMap2.data.objects.counties.geometries = geoOriginal;
     countyMap2.us.objects.counties.geometries = geoOriginal;
 
+    if (resetChecks){
+        ResetCheckBoxes();
+    }
+}
+
+function ResetCheckBoxes() {
+    console.log('reset')
+    d3.select('#ruralCheckbox').property('checked',true);
+    d3.select('#smallCityCheckbox').property('checked',true);
+    d3.select('#suburbanCheckbox').property('checked',true);
+    d3.select('#urbanCheckbox').property('checked',true);
 }
 
 function RefreshVisualizations() {

@@ -1,5 +1,5 @@
 class Scatterplot {
-    constructor(_config, _data) {
+    constructor(_config,_dispatcher, _data) {
         this.config = {
           parentElement: _config.parentElement,
           colorScale: _config.colorScale,
@@ -9,6 +9,7 @@ class Scatterplot {
           tooltipPadding: _config.tooltipPadding || 15
         }
         this.data = _data;
+        this.dispatcher = _dispatcher;
 
         this.InitVis();
     }
@@ -67,7 +68,26 @@ class Scatterplot {
             .attr('class', 'axis-title')
             .attr('x', 0)
             .attr('y', 0)
-            .attr('dy', '.71em')
+            .attr('dy', '.71em');
+
+        
+        vis.brush = d3.brush()
+            .extent([[0,0], [vis.config.containerWidth, vis.height]])
+            .on('brush', function({selection}) {
+              if (selection) vis.BrushMoved(selection);
+            })
+            .on('end', function({selection}) {
+              if (!selection) vis.Brushed(null);
+            });
+
+        vis.brushG = vis.svg.append('g')
+            .attr('class', 'brush x-brush')
+            .style('opacity', .5)
+            .style('pointer-events', 'all')
+            .call(vis.brush);
+        
+        
+        vis.brushTimer = null;
     }
 
     UpdateVis(xColumn, yColumn) {
@@ -90,7 +110,7 @@ class Scatterplot {
 
     RenderVis() {
         let vis = this;
-        
+        // TODO Add Data Transitions?
         const circles = vis.chart.selectAll('.point')
             .data(vis.filteredData, d => d.properties.display_name)
             .join('circle')
@@ -106,7 +126,7 @@ class Scatterplot {
                 .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
                 .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
                 .html(`
-                    <div class="tooltip-title">${d.properties.display_name}</div>
+                    <div class='tooltip-title'>${d.properties.display_name}</div>
                     <ul>
                         <li>x: ${d.properties[vis.xValue]}</li>
                         <li>y: ${d.properties[vis.yValue]}</li>
@@ -121,5 +141,40 @@ class Scatterplot {
         vis.xAxisGroup.call(vis.xAxis)
 
         vis.yAxisGroup.call(vis.yAxis)
+    }
+
+    BrushMoved(selection) {
+        let vis = this;
+        clearTimeout(vis.brushTimer);
+
+        vis.brushTimer = setTimeout(() => {
+            vis.Brushed(selection);
+        }, 300)
+    }
+
+    Brushed(selection) {
+        let vis = this;
+
+        clearTimeout(vis.brushTimer);
+        if (selection) {
+            console.log(selection);
+            const selectedData = vis.data.objects.counties.geometries.filter(d =>
+                vis.xScale(d.properties[vis.xValue]) >= selection[0][0] &&
+                vis.xScale(d.properties[vis.xValue]) <= selection[1][0] &&
+                vis.yScale(d.properties[vis.yValue]) >= selection[0][1] &&
+                vis.yScale(d.properties[vis.yValue]) <= selection[1][1]);
+                
+            console.log(selectedData)
+
+            const countyIds = selectedData.map(d => d.id)
+            console.log(countyIds)
+            vis.dispatcher.call('filterVisualizations', vis.event, countyIds, vis.config.parentElement)
+            
+        }
+        if (!selection) {
+            console.log('end')
+            vis.dispatcher.call('reset', vis.event)
+        }
+        
     }
 }
